@@ -1,0 +1,92 @@
+name: Node.js CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to VPS using ssh
+        uses: appleboy/ssh-action@v0.1.9
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_PRIVATE_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            set -euo pipefail
+
+            # --- Configuration ---
+            APP_DIR="/var/www/html/neelabh/server"
+            REPO_SSH="git@github.com:SoftyPy-IT/neelabh-server.git"
+            REPO_HTTPS="https://github.com/SoftyPy-IT/neelabh-server.git"
+            BRANCH="main"
+            PM2_NAME="neelabh-server"
+
+            # Ensure parent directory exists
+            mkdir -p "$(dirname "$APP_DIR")"
+
+            # If repo directory doesn't exist (or isn't a git repo), try to clone it
+            if [ ! -d "$APP_DIR/.git" ]; then
+              echo "No git repo found at $APP_DIR — attempting to clone."
+              if ! command -v git >/dev/null 2>&1; then
+                echo "ERROR: git is not installed on the server."
+                exit 1
+              fi
+
+              if git ls-remote "$REPO_SSH" >/dev/null 2>&1; then
+                git clone --depth 1 --branch "$BRANCH" "$REPO_SSH" "$APP_DIR" || true
+              else
+                git clone --depth 1 --branch "$BRANCH" "$REPO_HTTPS" "$APP_DIR"
+              fi
+            fi
+
+            cd "$APP_DIR"
+
+            # Ensure git available, fetch + reset to remote branch
+            if command -v git >/dev/null 2>&1; then
+              git fetch --all --prune
+              git checkout "$BRANCH"
+              git reset --hard "origin/$BRANCH"
+            else
+              echo "WARNING: git not available; skipping fetch/reset."
+            fi
+
+            # Copy .env only if it doesn't exist
+            if [ -f .env.example ]; then
+              cp -f .env.example .env
+              echo ".env overwritten from .env.example"
+            else
+              echo ".env.example not found; skipping .env setup."
+            fi
+
+            # Install dependencies (prefer npm ci for reproducible installs)
+            if ! command -v npm >/dev/null 2>&1; then
+              echo "ERROR: npm is not installed on the server."
+              exit 1
+            fi
+
+            npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+
+            # Build the project
+            npm run build
+
+            # Ensure pm2 is available, install globally if missing
+            if ! command -v pm2 >/dev/null 2>&1; then
+              echo "pm2 not found — installing globally"
+              npm install -g pm2
+            fi
+
+            # Start or restart the app with pm2 (uses npm start script)
+            if pm2 describe "$PM2_NAME" >/dev/null 2>&1; then
+              pm2 restart "$PM2_NAME"
+            else
+              pm2 start npm --name "$PM2_NAME" -- start
+            fi
+
+            # Persist pm2 process list
+            pm2 save
+
+            echo "Deployment complete."

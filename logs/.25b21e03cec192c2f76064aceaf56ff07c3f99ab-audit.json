@@ -1,0 +1,30 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/home/ibrahim-sikder/Desktop/softypy/neelabh/neelabh-server/logs/.25b21e03cec192c2f76064aceaf56ff07c3f99ab-audit.json",
+    "files": [
+        {
+            "date": 1772006970393,
+            "name": "/home/ibrahim-sikder/Desktop/softypy/neelabh/neelabh-server/logs/combined-2026-02-25.log",
+            "hash": "7b3fef6649040c947b347401fb2b0af2a4f15c27a1f03d387abeba2b36c887e0"
+        },
+        {
+            "date": 1772247758339,
+            "name": "/home/ibrahim-sikder/Desktop/softypy/neelabh/neelabh-server/logs/combined-2026-02-28.log",
+            "hash": "e210ce4c80cd2084dd1e471efc11a717d26b2751e4dd3b2fb2244badc654cd57"
+        },
+        {
+            "date": 1772335674155,
+            "name": "/home/ibrahim-sikder/Desktop/softypy/neelabh/neelabh-server/logs/combined-2026-03-01.log",
+            "hash": "a2419eb5260e00c4987a207f2065e5c43058bd20ac0171abafa99f62d511610b"
+        },
+        {
+            "date": 1772422273718,
+            "name": "/home/ibrahim-sikder/Desktop/softypy/neelabh/neelabh-server/logs/combined-2026-03-02.log",
+            "hash": "922653bfa1e9c3334e37bda3121dc47ffdf2cf35921652c81444aed1d2eb1485"
+        }
+    ],
+    "hashType": "sha256"
+}
