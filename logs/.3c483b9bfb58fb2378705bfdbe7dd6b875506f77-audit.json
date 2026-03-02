@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "/home/softypy/Desktop/files/projects/neelabh/neelabh-server/logs/.3c483b9bfb58fb2378705bfdbe7dd6b875506f77-audit.json",
+    "files": [
+        {
+            "date": 1764066279355,
+            "name": "/home/softypy/Desktop/files/projects/neelabh/neelabh-server/logs/error-2025-11-25.log",
+            "hash": "f1d34169effd53567cad4c9c38d31fcf8b5a39316e6cbc01d4cc1e302a8d8cae"
+        }
+    ],
+    "hashType": "sha256"
+}
